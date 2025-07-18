@@ -1,0 +1,27 @@
+#!/bin/bash
+set -euo pipefail
+
+if [ "$EUID" -ne 0 ]; then
+  echo "[-] Please run this script as root or with sudo."
+  exit 1
+fi
+
+IPT_BACKUP="/tmp/iptables-backup.rules"
+IP6T_BACKUP="/tmp/ip6tables-backup.rules"
+
+echo "[*] Saving iptables (IPv4) rules..."
+iptables-save > "$IPT_BACKUP"
+
+echo "[*] Saving ip6tables (IPv6) rules..."
+ip6tables-save > "$IP6T_BACKUP"
+
+echo "[*] Restarting nftables..."
+systemctl restart nftables
+
+echo "[*] Restoring iptables (IPv4) rules..."
+iptables-restore < "$IPT_BACKUP"
+
+echo "[*] Restoring ip6tables (IPv6) rules..."
+ip6tables-restore < "$IP6T_BACKUP"
+
+echo "[+] Done. nftables restarted and all iptables rules restored."
