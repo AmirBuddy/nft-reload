@@ -8,12 +8,20 @@ fi
 
 IPT_BACKUP="/tmp/iptables-backup.rules"
 IP6T_BACKUP="/tmp/ip6tables-backup.rules"
+ARP_BACKUP="/tmp/arptables-backup.rules"
+EBT_BACKUP="/tmp/ebtables-backup.rules"
 
 echo "[*] Saving iptables (IPv4) rules..."
 iptables-save > "$IPT_BACKUP"
 
 echo "[*] Saving ip6tables (IPv6) rules..."
 ip6tables-save > "$IP6T_BACKUP"
+
+echo "[*] Saving arptables rules..."
+arptables-save > "$ARP_BACKUP"
+
+echo "[*] Saving ebtables rules..."
+ebtables-save > "$EBT_BACKUP"
 
 echo "[*] Restarting nftables..."
 systemctl restart nftables
@@ -24,4 +32,10 @@ iptables-restore < "$IPT_BACKUP"
 echo "[*] Restoring ip6tables (IPv6) rules..."
 ip6tables-restore < "$IP6T_BACKUP"
 
-echo "[+] Done. nftables restarted and all iptables rules restored."
+echo "[*] Restoring arptables rules..."
+arptables-restore < "$ARP_BACKUP"
+
+echo "[*] Restoring ebtables rules..."
+ebtables-restore < "$EBT_BACKUP"
+
+echo "[+] Done. nftables restarted and all iptables, arptables, and ebtables rules restored."
